@@ -1,5 +1,5 @@
 import {default as inquirer} from 'inquirer';
-import { dialog } from "node-file-dialog";
+import { dialog } from "@fheahdythdr/node-file-dialog";
 import fs from 'fs';
 import interrupt from 'inquirer-interrupted-prompt';
 import * as utils from "./utils.mjs";
