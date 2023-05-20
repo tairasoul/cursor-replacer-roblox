@@ -3,6 +3,7 @@
 #include <thread>
 #include <curl/curl.h>
 #include <windows.h>
+#include <cstdlib>
 
 std::string rootDir("C:\\RCOC");
 
@@ -34,7 +35,7 @@ int writefile(std::string url, std::string path) {
 
 int main(int argc, char* argv[]) {
 	std::string userIn;
-	std::cout << "Welcome to the RCO Installer/Updater!\nRCO is made, owned, and developed by Kaede and L8X\n\nType \"install\" and press enter to continue!\nType \"uninstall\" and press enter to uninstall :(\n\n";
+	std::cout << "Welcome to the RCOC Installer/Updater!\nRCOC is made by fheahdythdr, parts of the source are from Kaede and L8X's RCO (Roblox Client Optimizer)\n\nType \"install\" and press enter to continue!\nType \"uninstall\" and press enter to uninstall :(\n\n";
     std::cin >> userIn;
 
     if (std::filesystem::exists(rootDir) == false) {
@@ -56,6 +57,11 @@ int main(int argc, char* argv[]) {
         writefile("https://raw.githubusercontent.com/fheahdythdr/cursor-replacer-roblox/main/default_cursors/arrow.png", rootDir + "\\default_cursors\\arrow.png");
         writefile("https://raw.githubusercontent.com/fheahdythdr/cursor-replacer-roblox/main/default_cursors/arrowfar.png", rootDir + "\\default_cursors\\arrowfar.png");
         writefile("https://raw.githubusercontent.com/fheahdythdr/cursor-replacer-roblox/main/default_cursors/ibeam.png", rootDir + "\\default_cursors\\ibeam.png");
+        std::filesystem::path directory = "C:\\RCOC\\backend";
+        std::filesystem::current_path(directory);
+        std::cout << "installing required packages in 5 seconds";
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        system("npm i");
 
         HKEY hKey;
         if (RegOpenKeyExA(HKEY_CURRENT_USER, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_ALL_ACCESS, &hKey) == ERROR_SUCCESS) {
