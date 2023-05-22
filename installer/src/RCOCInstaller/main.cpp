@@ -85,12 +85,6 @@ int main(int argc, char* argv[]) {
         exit(0);
 	}
     else if (userIn == std::string("uninstall")) { // Uninstall
-        if (argv[0] == (rootDir+"\\RCO2Installer.exe").c_str() || argv[0] == "C:\\RCOC\\RCOC.exe") {
-            std::cout << "To uninstall, please run the installer outside of this updater, you can redownload this installer on the github.\nClosing in 5 seconds.\n";
-            std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-            return 0;
-        }
-
         if (std::filesystem::exists("C:\\RCO2") == true) {
             std::filesystem::remove_all("C:\\RCO2");
         }
