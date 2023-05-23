@@ -5,6 +5,33 @@
 #include <windows.h>
 #include <cstdlib>
 
+// thanks chatgpt
+
+std::wstring stringToWideString(const std::string& str) {
+    int wideStrLength = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, nullptr, 0);
+    if (wideStrLength == 0) {
+        throw std::runtime_error("Failed to convert string to wide string.");
+    }
+    std::wstring wideStr(wideStrLength, L'\0');
+    if (MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, &wideStr[0], wideStrLength) == 0) {
+        throw std::runtime_error("Failed to convert string to wide string.");
+    }
+    return wideStr;
+}
+
+std::string wideStringToString(const std::wstring& wideStr) {
+    int strLength = WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+    if (strLength == 0) {
+        throw std::runtime_error("Failed to convert wide string to string.");
+    }
+    std::string str(strLength, '\0');
+    if (WideCharToMultiByte(CP_UTF8, 0, wideStr.c_str(), -1, &str[0], strLength, nullptr, nullptr) == 0) {
+        throw std::runtime_error("Failed to convert wide string to string.");
+    }
+    return str;
+}
+
+
 std::string rootDir("C:\\RCOC");
 
 int writefile(std::string url, std::string path) {
@@ -57,6 +84,100 @@ int main(int argc, char* argv[]) {
         writefile("https://raw.githubusercontent.com/fheahdythdr/cursor-replacer-roblox/main/default_cursors/arrow.png", rootDir + "\\default_cursors\\arrow.png");
         writefile("https://raw.githubusercontent.com/fheahdythdr/cursor-replacer-roblox/main/default_cursors/arrowfar.png", rootDir + "\\default_cursors\\arrowfar.png");
         writefile("https://raw.githubusercontent.com/fheahdythdr/cursor-replacer-roblox/main/default_cursors/ibeam.png", rootDir + "\\default_cursors\\ibeam.png");
+        SECURITY_ATTRIBUTES sa;
+        sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+        sa.lpSecurityDescriptor = nullptr;
+        sa.bInheritHandle = TRUE;
+
+        HANDLE hRead, hWrite;
+        if (!CreatePipe(&hRead, &hWrite, &sa, 0)) {
+            std::cout << "Error creating pipe." << std::endl;
+            return 1;
+        }
+
+        STARTUPINFOA si1;
+        PROCESS_INFORMATION pi1;
+        ZeroMemory(&si1, sizeof(STARTUPINFOA));
+        si1.cb = sizeof(STARTUPINFOA);
+        si1.hStdError = hWrite;
+        si1.hStdOutput = hWrite;
+        si1.dwFlags |= STARTF_USESTDHANDLES;
+
+        char commandLine[] = "node --version";
+
+        if (!CreateProcessA(nullptr, commandLine, nullptr, nullptr, TRUE, 0, nullptr, nullptr, &si1, &pi1)) {
+            std::cout << "Error creating process." << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+            return 1;
+        }
+
+        CloseHandle(hWrite);
+
+        char buffer[128];
+        DWORD bytesRead;
+        std::string output;
+
+        while (ReadFile(hRead, buffer, sizeof(buffer) - 1, &bytesRead, nullptr)) {
+            if (bytesRead == 0) {
+                break;
+            }
+            buffer[bytesRead] = '\0';
+            output += buffer;
+        }
+
+        CloseHandle(hRead);
+
+        DWORD exitCode;
+        GetExitCodeProcess(pi1.hProcess, &exitCode);
+        CloseHandle(pi1.hProcess);
+        CloseHandle(pi1.hThread);
+
+        if (exitCode == 0 && output == "v20.2.0\n") {
+            std::cout << "Node.js is installed, skipping NodeJS install.\n" << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
+        else {
+            std::cout << "Node.js is not installed or is on a lower version. Installing NodeJS v20.2.0 in 5 seconds." << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+            std::filesystem::path temp = std::filesystem::temp_directory_path();
+            temp /= "RCOCINSTALL";
+            std::filesystem::create_directory(temp);
+            writefile("https://nodejs.org/dist/v20.2.0/node-v20.2.0-x64.msi", (temp / "node-v20.2.0-x64.msi").string());
+            std::wstring tempWide = stringToWideString((temp / "node-v20.2.0-x64.msi").string());
+
+            std::wstring commandLine = L"msiexec /passive /i " + tempWide;
+
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+
+            STARTUPINFOW si;
+            PROCESS_INFORMATION pi;
+            ZeroMemory(&si, sizeof(STARTUPINFOW));
+            si.cb = sizeof(STARTUPINFOW);
+
+            if (!CreateProcessW(nullptr, const_cast<LPWSTR>(commandLine.c_str()), nullptr, nullptr, TRUE, 0, nullptr, nullptr, &si, &pi)) {
+                std::cout << "Error creating process msiexec." << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(5));
+                return 1;
+            }
+
+            WaitForSingleObject(pi.hProcess, INFINITE);
+
+            DWORD exitCode;
+            GetExitCodeProcess(pi.hProcess, &exitCode);
+            CloseHandle(pi.hProcess);
+            CloseHandle(pi.hThread);
+
+            if (exitCode == 0) {
+                std::cout << "Installation completed successfully." << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(5));
+            }
+            else {
+                std::cout << "Installation failed." << "\nExit code:" << exitCode << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(5));
+            }
+
+            std::filesystem::remove_all(temp);
+        }
         std::filesystem::path directory = "C:\\RCOC\\backend";
         std::filesystem::current_path(directory);
         std::cout << "installing required packages in 5 seconds\n";
