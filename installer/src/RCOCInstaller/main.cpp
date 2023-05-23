@@ -59,13 +59,14 @@ int main(int argc, char* argv[]) {
         writefile("https://raw.githubusercontent.com/fheahdythdr/cursor-replacer-roblox/main/default_cursors/ibeam.png", rootDir + "\\default_cursors\\ibeam.png");
         std::filesystem::path directory = "C:\\RCOC\\backend";
         std::filesystem::current_path(directory);
-        std::cout << "installing required packages in 5 seconds";
+        std::cout << "installing required packages in 5 seconds\n";
         std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::cout << "installing.\n";
         system("npm i");
 
         HKEY hKey;
         if (RegOpenKeyExA(HKEY_CURRENT_USER, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_ALL_ACCESS, &hKey) == ERROR_SUCCESS) {
-            RegSetValueExA(hKey, "RCOC", 0, REG_SZ, (const BYTE*)(rootDir + "\\RCOC.exe").c_str(),36);
+            RegSetValueExA(hKey, "RCOCEXE", 0, REG_SZ, (const BYTE*)(rootDir + "\\RCOC.exe").c_str(),36);
             RegCloseKey(hKey);
         }
         else {
@@ -85,6 +86,12 @@ int main(int argc, char* argv[]) {
         exit(0);
 	}
     else if (userIn == std::string("uninstall")) { // Uninstall
+        if (argv[0] == (rootDir+"\\RCO2Installer.exe").c_str() || argv[0] == "C:\\RCOC\\RCOC.exe") {
+            std::cout << "To uninstall, please run the installer outside of this updater, you can redownload this installer on the github.\nClosing in 5 seconds.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+            return 0;
+        }
+
         if (std::filesystem::exists("C:\\RCO2") == true) {
             std::filesystem::remove_all("C:\\RCO2");
         }
@@ -95,7 +102,7 @@ int main(int argc, char* argv[]) {
 
         HKEY hKey;
         if (RegOpenKeyExA(HKEY_CURRENT_USER, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_ALL_ACCESS, &hKey) == ERROR_SUCCESS) {
-            RegDeleteValueA(hKey, "RCOC");
+            RegDeleteValueA(hKey, "RCOCEXE");
         }
         else {
             std::cout << "Registry error, RCOC startup regkey not removed...\n";
