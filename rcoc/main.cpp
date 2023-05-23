@@ -156,7 +156,7 @@ int main(int argc, char** argv) {
     SetConsoleTitle(L"Roblox Cursor Replacer");
 
     if (std::filesystem::exists(rootDir) == false) {
-        std::cout << "Could not find proper RCO files, please reinstall RCO | 0x1\n";
+        std::cout << "Could not find proper RCR files, please reinstall RCR | 0x1\n";
         std::cin.get();
         return 1;
     }
@@ -266,8 +266,6 @@ int main(int argc, char** argv) {
     SetWindowLong(consoleWindow, GWL_STYLE, GetWindowLong(consoleWindow, GWL_STYLE) & ~WS_MAXIMIZEBOX);
     EnableMenuItem(GetSystemMenu(consoleWindow, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 
-    if (std::filesystem::exists(rootDir + "\\cursors") == false) std::filesystem::create_directory(rootDir + "\\cursors");
-
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
 
@@ -293,10 +291,6 @@ int main(int argc, char** argv) {
     }
 
     delete[] wideCommand;
-
-    // Close process and thread handles
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
 
     //Input loop
     while (true) {
@@ -327,23 +321,9 @@ int main(int argc, char** argv) {
             if (RegOpenKeyExA(HKEY_CURRENT_USER, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_ALL_ACCESS, &hKey) == ERROR_SUCCESS) {
                 // Check if the value exists
                 DWORD valueType;
-                DWORD valueType2;
                 if (RegQueryValueExA(hKey, "RCOCEXE", nullptr, &valueType, nullptr, nullptr) == ERROR_SUCCESS) {
                     // Delete the value
                     if (RegDeleteValueA(hKey, "RCOCEXE") == ERROR_SUCCESS) {
-                        std::cout << "Registry value deleted." << std::endl;
-                    }
-                    else {
-                        std::cerr << "Failed to delete registry value." << std::endl;
-                    }
-                }
-                else {
-                    std::cout << "Registry value does not exist." << std::endl;
-                }
-
-                if (RegQueryValueExA(hKey, "RCOCMAIN", nullptr, &valueType2, nullptr, nullptr) == ERROR_SUCCESS) {
-                    // Delete the value
-                    if (RegDeleteValueA(hKey, "RCOCMAIN") == ERROR_SUCCESS) {
                         std::cout << "Registry value deleted." << std::endl;
                     }
                     else {
