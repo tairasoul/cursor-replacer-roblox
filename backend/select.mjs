@@ -29,14 +29,16 @@ const tbl = {
         execute: async () => {
             try {
                 const paths = await dialog({
-                    type: 'open-file',
-                    extra: {
-                        types: {
-                            "all image files": "*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.ico",
-                            "all files": '*.*'
+                    dialogtype: 'open-file',
+                    types: [
+                        {
+                            display: "all image files", extensions: "*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.ico"
                         },
-                        title: "pick a cursor to use"
-                    }
+                        {
+                            display: "all files", extensions: "*.*"
+                        }
+                    ],
+                    title: "pick a cursor to use"
                 })
                 const currentActive = JSON.parse(fs.readFileSync("C:\\RCOC\\selected.json"));
                 currentActive["Arrow"] = paths[0];
@@ -49,14 +51,16 @@ const tbl = {
         execute: async () => {
             try {
                 const paths = await dialog({
-                    type: 'open-file',
-                    extra: {
-                        types: {
-                            "all image files": "*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.ico",
-                            "all files": '*.*'
+                    dialogtype: 'open-file',
+                    types: [
+                        {
+                            display: "all image files", extensions: "*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.ico"
                         },
-                        title: "pick a cursor to use"
-                    }
+                        {
+                            display: "all files", extensions: "*.*"
+                        }
+                    ],
+                    title: "pick a cursor to use"
                 })
                 const currentActive = JSON.parse(fs.readFileSync("C:\\RCOC\\selected.json"));
                 currentActive["ArrowFar"] = paths[0];
@@ -69,14 +73,16 @@ const tbl = {
         execute: async () => {
             try {
                 const paths = await dialog({
-                    type: 'open-file',
-                    extra: {
-                        types: {
-                            "all image files": "*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.ico",
-                            "all files": '*.*'
+                    dialogtype: 'open-file',
+                    types: [
+                        {
+                            display: "all image files", extensions: "*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.ico"
                         },
-                        title: "pick a cursor to use"
-                    }
+                        {
+                            display: "all files", extensions: "*.*"
+                        }
+                    ],
+                    title: "pick a cursor to use"
                 })
                 const currentActive = JSON.parse(fs.readFileSync("C:\\RCOC\\selected.json"));
                 currentActive["IBeam"] = paths[0];
