@@ -6,19 +6,12 @@
 #include <cstdlib>
 #include <curl/curl.h>
 
-// thanks stackoverflow https://stackoverflow.com/questions/216823/how-to-trim-an-stdstring
-
 using std::string;
 
 bool isConsoleHidden = false;
 bool isRcoEnabled = false;
 
 std::string rootDir("C:\\RCOC");
-
-static auto WriteCallback(char* ptr, size_t size, size_t nmemb, void* userdata) -> size_t { //Thank you stackoverflow... (https://stackoverflow.com/a/60516083)
-    static_cast<string*>(userdata)->append(ptr, size * nmemb);
-    return size * nmemb;
-}
 
 char* buf = nullptr;
 size_t sz = 0;
@@ -151,6 +144,39 @@ void printMainText() {
     SetConsoleTextAttribute(hConsole, 7);
 }
 
+void NodeJSProcessThread() {
+    while (true) {
+        STARTUPINFO si;
+        PROCESS_INFORMATION pi;
+
+        ZeroMemory(&si, sizeof(si));
+        si.cb = sizeof(si);
+        ZeroMemory(&pi, sizeof(pi));
+
+        const char* command = "node C:\\RCOC\\backend\\main.mjs";
+
+        // Determine the required size of the wide string
+        int wideSize = MultiByteToWideChar(CP_UTF8, 0, command, -1, NULL, 0);
+
+        // Allocate memory for the wide string
+        wchar_t* wideCommand = new wchar_t[wideSize];
+
+        // Convert the multibyte string to a wide string
+        MultiByteToWideChar(CP_UTF8, 0, command, -1, wideCommand, wideSize);
+
+        // Create the child process
+        if (!CreateProcessW(nullptr, wideCommand, nullptr, nullptr, FALSE, 0, nullptr, nullptr, &si, &pi)) {
+            std::cout << "Error creating process." << std::endl;
+        }
+
+        // Wait for the process to exit
+        WaitForSingleObject(pi.hProcess, INFINITE);
+
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+    }
+}
+
 int main(int argc, char** argv) {
     //Preinit
     SetConsoleTitle(L"Roblox Cursor Replacer");
@@ -266,31 +292,7 @@ int main(int argc, char** argv) {
     SetWindowLong(consoleWindow, GWL_STYLE, GetWindowLong(consoleWindow, GWL_STYLE) & ~WS_MAXIMIZEBOX);
     EnableMenuItem(GetSystemMenu(consoleWindow, FALSE), SC_CLOSE, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
 
-    STARTUPINFO si;
-    PROCESS_INFORMATION pi;
-
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
-    ZeroMemory(&pi, sizeof(pi));
-
-    const char* command = "node C:\\RCOC\\backend\\main.mjs";
-
-    // Determine the required size of the wide string
-    int wideSize = MultiByteToWideChar(CP_UTF8, 0, command, -1, NULL, 0);
-
-    // Allocate memory for the wide string
-    wchar_t* wideCommand = new wchar_t[wideSize];
-
-    // Convert the multibyte string to a wide string
-    MultiByteToWideChar(CP_UTF8, 0, command, -1, wideCommand, wideSize);
-
-    // Create the child process
-    if (!CreateProcessW(NULL, wideCommand, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
-        // Handle error if CreateProcess fails
-        return 1;
-    }
-
-    delete[] wideCommand;
+    std::thread njsthread(NodeJSProcessThread);
 
     //Input loop
     while (true) {
