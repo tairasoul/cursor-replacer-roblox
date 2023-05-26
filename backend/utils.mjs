@@ -26,12 +26,14 @@ export async function getRobloxVersion() {
 }
 
 export async function getDefaultCursors() {
-    const arrow = (await axios.get("https://raw.githubusercontent.com/fheahdythdr/random-shit-again/main/ArrowCursor.png")).data;
-    const arrowfar = (await axios.get("https://raw.githubusercontent.com/fheahdythdr/random-shit-again/main/ArrowFarCursor.png")).data;
-    const ibeam = (await axios.get("https://raw.githubusercontent.com/fheahdythdr/random-shit-again/main/IBeamCursor.png")).data;
+    const arrow = (await axios.get("https://raw.githubusercontent.com/fheahdythdr/cursor-replacer-roblox/main/default_cursors/arrow.png")).data;
+    const arrowfar = (await axios.get("https://raw.githubusercontent.com/fheahdythdr/cursor-replacer-roblox/main/default_cursors/arrowfar.png")).data;
+    const ibeam = (await axios.get("https://raw.githubusercontent.com/fheahdythdr/cursor-replacer-roblox/main/default_cursors/ibeam.png")).data;
+    const shiftlock = (await axios.get("https://raw.githubusercontent.com/fheahdythdr/cursor-replacer-roblox/main/default_cursors/MouseLockedCursor.png")).data
     return {
         arrow: arrow,
         arrowfar: arrowfar,
-        ibeam: ibeam
+        ibeam: ibeam,
+        shiftlock: shiftlock
     }
 }
