@@ -1,7 +1,7 @@
 {
   "main": "main.mjs",
   "dependencies": {
-    "fheahdythdr/node-file-dialog": "github:fheahdythdr/node-file-dialog",
+    "@fheahdythdr/node-file-dialog": "^1.0.6",
     "axios": "^1.4.0",
     "commander": "^10.0.1",
     "inquirer": "^9.2.4",
